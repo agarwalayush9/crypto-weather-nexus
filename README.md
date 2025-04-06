@@ -1,7 +1,7 @@
-CryptoWeather Nexus
+# CryptoWeather Nexus
 CryptoWeather Nexus is a web application that combines cryptocurrency data, weather updates, and news into a single dashboard. It provides real-time updates, price alerts, and a responsive design for seamless user experience across devices.
 
-Features
+# Features
 Weather Module: Displays weather data for multiple cities with real-time alerts.
 Crypto Module: Shows cryptocurrency prices, market trends, and price alerts.
 Nexus News: Fetches and displays the latest news related to cryptocurrency.
@@ -9,7 +9,7 @@ Responsive Design: Optimized for both desktop and mobile views.
 Price Alerts: Notifies users when cryptocurrency prices cross a threshold.
 Auto-Refresh: Automatically refreshes data when API limits are hit.
 
-Setup Instructions
+# Setup Instructions
 Prerequisites
 Node.js: Ensure you have Node.js installed (v16 or higher recommended).
 npm or yarn: Package manager for installing dependencies.
@@ -18,7 +18,7 @@ OpenWeatherMap API key for weather data.
 CoinGecko API for cryptocurrency data.
 NewsData.io API key for news.
 
-Installation
+# Installation
 
 1. Clone the repository:
 
@@ -27,7 +27,7 @@ cd crypto-weather-nexus
 
 2. npm install
 
-# or
+ or
 
 yarn install
 
@@ -40,14 +40,14 @@ NEXT_PUBLIC_NEWSDATA_API_KEY=your_newsdata_api_key
 4. Start the development server:
    npm run dev
 
-# or
+ or
 
 yarn dev
 
 5. Open the app in your browser:
    http://localhost:3000
 
-Design Decisions
+# Design Decisions
 
 1. Responsive Design
    Used Tailwind CSS for styling and responsiveness.
