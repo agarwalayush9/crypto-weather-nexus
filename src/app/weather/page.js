@@ -1,40 +1,96 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { GlobalContext } from '@/context/GlobalContext';
 import { fetchWeather } from '@/utils/fetchWeather';
+import { useWeatherAlerts } from '@/hooks/useWeatherAlerts';
 import Link from 'next/link';
+import Loading from '@/components/Loading';
+import Error from '@/components/Error';
 
-const cities = ['New York', 'London', 'Tokyo','Paris', 'Sydney', 'Toronto', 'Dubai', 'Singapore', 'Mumbai'];
+const cities = ['New York', 'London', 'Tokyo', 'Paris', 'Sydney', 'Toronto', 'Dubai', 'Singapore', 'Mumbai'];
 
 export default function WeatherPage() {
-  const [data, setData] = useState([]);
+  const {
+    cityFavorites,
+    addCityFavorite,
+    removeCityFavorite,
+    fetchedData,
+    setFetchedData,
+    loading,
+    setLoading,
+    error,
+    setError,
+  } = useContext(GlobalContext);
+  const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
-    Promise.all(cities.map(city => fetchWeather(city)))
-      .then(setData)
-      .catch(console.error);
-  }, []);
+    async function fetchWeatherData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const weatherData = await Promise.all(cities.map((city) => fetchWeather(city)));
+        setFetchedData((prev) => ({ ...prev, weather: weatherData })); // Store globally
+      } catch (err) {
+        setError('Failed to fetch weather data.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchWeatherData();
+  }, [setFetchedData, setLoading, setError]);
+
+  // Handle weather alerts
+  useWeatherAlerts((alert) => {
+    setAlerts((prevAlerts) => [alert, ...prevAlerts.slice(0, 4)]); // Keep the last 5 alerts
+    setTimeout(() => {
+      setAlerts((prevAlerts) => prevAlerts.slice(0, -1)); // Auto-dismiss after 5 seconds
+    }, 5000);
+  });
+
+  if (loading) return <Loading />;
+  if (error) return <Error message={error} />;
 
   return (
-    <main className=" min-h-screen bg-gradient-to-br from-[#0d1a2d] via-[#0a1c2f] to-[#081c29] text-white px-6 py-16 pt-28">
-      <div className="max-w-6xl mx-auto text-center">
-        {/* <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-500 drop-shadow mb-10 text-center">
-          🌦️ Global Weather Dashboard
-        </h1> */}
-         <p className="text-lg text-purple-200 mb-10">
-          Detailed view of current weather metrics powered by — OpenWeatherMap.
-        </p>
+    <main className="min-h-screen bg-gradient-to-br from-[#0d1a2d] via-[#0a1c2f] to-[#081c29] text-white px-6 py-16 pt-28">
+      {/* Weather Alerts Section */}
+      <div className="fixed top-4 right-4 space-y-4 z-50">
+        {alerts.map((alert, index) => (
+          <div
+            key={index}
+            className="bg-red-500/90 text-white rounded-lg shadow-lg p-4 w-80 relative animate-slide-in-right"
+          >
+            <button
+              className="absolute top-2 right-2 text-white hover:text-gray-300"
+              onClick={() =>
+                setAlerts((prevAlerts) => prevAlerts.filter((_, i) => i !== index))
+              }
+            >
+              ✕
+            </button>
+            <p className="font-semibold">{alert.message}</p>
+            <p className="text-sm text-gray-200">{alert.timestamp}</p>
+          </div>
+        ))}
+      </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
-          {data.map((city, i) => (
-            <Link href={`/weather/${encodeURIComponent(city.name.toLowerCase())}`} key={i}>
+      {/* Favorites Section */}
+      {cityFavorites.length > 0 && (
+        <div className="max-w-6xl mx-auto text-center mt-2 mb-10">
+          <h2 className="text-3xl font-bold text-purple-300 mb-6">Your Favorite Cities</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {cityFavorites.map((city) => (
               <div
+                key={city.name}
                 className="relative bg-white/5 border border-cyan-400/20 rounded-2xl p-6 shadow-lg hover:shadow-cyan-500/30 hover:scale-[1.03] transition duration-300 backdrop-blur-md cursor-pointer"
               >
-                <div className="absolute top-3 right-3 text-cyan-400 text-sm font-medium bg-cyan-900/30 px-2 py-0.5 rounded-full uppercase tracking-wide">
-                  {city.sys.country}
-                </div>
-
+                <button
+                  onClick={() => removeCityFavorite(city.name)}
+                  className="absolute top-3 right-3 text-lg text-yellow-400 hover:text-gray-300"
+                >
+                  ✕
+                </button>
                 <h2 className="text-2xl font-semibold text-cyan-200 mb-2">{city.name}</h2>
                 <p className="text-lg text-white mb-1">
                   🌡 Temperature: <span className="text-cyan-300">{city.main.temp}°C</span>
@@ -45,8 +101,53 @@ export default function WeatherPage() {
                 <p className="text-white mb-1 capitalize">
                   ⛅ Condition: <span className="text-blue-300">{city.weather[0].description}</span>
                 </p>
+                <Link
+                  href={`/weather/${encodeURIComponent(city.name.toLowerCase())}`}
+                  className="inline-block mt-4 px-4 py-2 text-sm font-medium text-purple-200 bg-purple-800/30 hover:bg-purple-700/40 rounded-xl transition-all"
+                >
+                  🔍 View Details
+                </Link>
               </div>
-            </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Main Weather Data */}
+      <div className="max-w-6xl mx-auto text-center mt-2">
+        <p className="text-lg text-purple-200 mb-10">
+          Detailed view of current weather metrics powered by — OpenWeatherMap.
+        </p>
+
+        <div className="grid gap-8 md:grid-cols-3">
+          {fetchedData.weather?.map((city, i) => (
+            <div
+              key={i}
+              className="relative bg-white/5 border border-cyan-400/20 rounded-2xl p-6 shadow-lg hover:shadow-cyan-500/30 hover:scale-[1.03] transition duration-300 backdrop-blur-md cursor-pointer"
+            >
+              <button
+                onClick={() => addCityFavorite(city)}
+                className="absolute top-3 right-3 text-lg text-gray-400 hover:text-yellow-400"
+              >
+                ☆
+              </button>
+              <h2 className="text-2xl font-semibold text-cyan-200 mb-2">{city.name}</h2>
+              <p className="text-lg text-white mb-1">
+                🌡 Temperature: <span className="text-cyan-300">{city.main.temp}°C</span>
+              </p>
+              <p className="text-white mb-1">
+                💧 Humidity: <span className="text-cyan-200">{city.main.humidity}%</span>
+              </p>
+              <p className="text-white mb-1 capitalize">
+                ⛅ Condition: <span className="text-blue-300">{city.weather[0].description}</span>
+              </p>
+              <Link
+                href={`/weather/${encodeURIComponent(city.name.toLowerCase())}`}
+                className="inline-block mt-4 px-4 py-2 text-sm font-medium text-purple-200 bg-purple-800/30 hover:bg-purple-700/40 rounded-xl transition-all"
+              >
+                🔍 View Details
+              </Link>
+            </div>
           ))}
         </div>
       </div>

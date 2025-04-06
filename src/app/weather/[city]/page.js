@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Loading from '@/components/Loading';
 import { fetchWeather, fetchWeatherHistory } from '@/utils/fetchWeather';
 
 export default function CityWeatherDetail() {
@@ -30,7 +31,7 @@ export default function CityWeatherDetail() {
   if (!weather) {
     return (
       <main className="pt-28 text-center text-white">
-        <p>Loading...</p>
+        <Loading/>
       </main>
     );
   }

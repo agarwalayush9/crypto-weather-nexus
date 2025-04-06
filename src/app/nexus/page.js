@@ -1,24 +1,39 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Loading from '@/components/Loading';
+import Error from '@/components/Error';
 
 export default function NewsPage() {
   const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   useEffect(() => {
     async function fetchNews() {
+      setLoading(true);
+      setError(null);
       try {
         const res = await fetch(
           `https://newsdata.io/api/1/news?apikey=${process.env.NEXT_PUBLIC_NEWSDATA_API_KEY}&q=cryptocurrency&language=en&category=business`
         );
+        if (!res.ok) {
+          throw new Error('Failed to fetch news data.');
+        }
         const data = await res.json();
         setNews(data.results.slice(0, 5));
       } catch (error) {
         console.error('Failed to fetch news:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchNews();
   }, []);
+
+  if (loading) return <Loading />;
+  if (error) return <Error message={error} />;
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-900 to-black text-white px-6 py-24 pt-28">

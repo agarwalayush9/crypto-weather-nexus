@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Loading from '@/components/Loading';
 import { fetchCryptoDetails, fetchCryptoMarketChart } from "@/utils/fetchCrypto";
 
 export default function CryptoDetailPage() {
@@ -33,7 +34,7 @@ export default function CryptoDetailPage() {
   }, [id]);
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
-  if (!data) return <div className="text-gray-300 p-4">Loading...</div>;
+  if (!data) return <Loading/>;
 
   return (
     <main className="pt-28 px-6 min-h-screen bg-gradient-to-br from-[#0f051d] via-[#1a0e2a] to-[#2b0c3d] text-white">
