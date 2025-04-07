@@ -36,7 +36,7 @@ export default function NewsPage() {
   if (error) return <Error message={error} />;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-900 to-black text-white px-6 py-24 pt-28">
+    <main className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-900 to-black text-white px-6 py-24 pt-20">
       <div className="max-w-5xl mx-auto text-center space-y-12">
         {/* <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-md">
           Crypto News Module

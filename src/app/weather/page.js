@@ -53,7 +53,7 @@ export default function WeatherPage() {
   if (error) return <Error message={error} />;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0d1a2d] via-[#0a1c2f] to-[#081c29] text-white px-6 py-16 pt-28">
+    <main className="min-h-screen bg-gradient-to-br from-[#0d1a2d] via-[#0a1c2f] to-[#081c29] text-white px-6 py-16 pt-20">
       {/* Weather Alerts Section */}
       <div className="fixed top-4 right-4 space-y-4 z-50">
         {alerts.map((alert, index) => (

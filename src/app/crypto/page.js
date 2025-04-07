@@ -115,7 +115,7 @@ export default function CryptoPage() {
     );
 
   return (
-    <main className="pt-28 min-h-screen bg-gradient-to-br from-[#0f051d] via-[#1a0e2a] to-[#2b0c3d] text-white px-6 py-16">
+    <main className="pt-20 min-h-screen bg-gradient-to-br from-[#0f051d] via-[#1a0e2a] to-[#2b0c3d] text-white px-6 py-16">
       {navigating && <Loading />} {/* Show spinner during navigation */}
       <Toast />
 
